@@ -2,6 +2,7 @@ package co.apptailor.Worker.core;
 
 import android.content.Context;
 
+import com.facebook.react.NativeModuleRegistryBuilder;
 import com.facebook.react.EagerModuleProvider;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.CatalystInstance;
@@ -17,6 +18,7 @@ import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.NativeModuleCallExceptionHandler;
 import com.facebook.react.cxxbridge.NativeModuleRegistry;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.bridge.queue.ReactQueueConfigurationSpec;
 import com.facebook.react.devsupport.DevSupportManager;
@@ -32,6 +34,7 @@ public class ReactContextBuilder {
     private Context parentContext;
     private JSBundleLoader jsBundleLoader;
     private DevSupportManager devSupportManager;
+    private ReactInstanceManager instanceManager;
     private ArrayList<ReactPackage> reactPackages;
 
     public ReactContextBuilder(Context context) {
@@ -46,6 +49,11 @@ public class ReactContextBuilder {
 
     public ReactContextBuilder setDevSupportManager(DevSupportManager devSupportManager) {
         this.devSupportManager = devSupportManager;
+        return this;
+    }
+
+    public ReactContextBuilder setReactInstanceManager(ReactInstanceManager manager) {
+        this.instanceManager = manager;
         return this;
     }
 
@@ -66,7 +74,7 @@ public class ReactContextBuilder {
 
         // load native modules
         final List<ModuleSpec> mModuleSpecList = new ArrayList<>();
-        //NativeModuleRegistry.Builder nativeRegistryBuilder = new NativeModuleRegistry.Builder();
+        NativeModuleRegistryBuilder nativeRegistryBuilder = new NativeModuleRegistryBuilder(reactContext, false);
         addNativeModules(reactContext,mModuleSpecList); //, nativeRegistryBuilder);
 
         // load js modules
@@ -76,10 +84,10 @@ public class ReactContextBuilder {
         CatalystInstanceImpl.Builder catalystInstanceBuilder = new CatalystInstanceImpl.Builder()
                 .setReactQueueConfigurationSpec(ReactQueueConfigurationSpec.createDefault())
                 .setJSExecutor(jsExecutor)
-                //.setRegistry(nativeRegistryBuilder.build())
-                .setRegistry(new NativeModuleRegistry(
-                  mModuleSpecList,
-                  Collections.<Class, ReactModuleInfo>emptyMap()))
+                .setRegistry(nativeRegistryBuilder.build())
+//                .setRegistry(new NativeModuleRegistry(
+//                  mModuleSpecList,
+//                  Collections.<Class, ReactModuleInfo>emptyMap()))
                 .setJSModuleRegistry(jsModulesBuilder.build())
                 .setJSBundleLoader(jsBundleLoader)
                 .setNativeModuleCallExceptionHandler(devSupportManager != null
