@@ -73,9 +73,8 @@ public class ReactContextBuilder {
         }
 
         // load native modules
-        final List<ModuleSpec> mModuleSpecList = new ArrayList<>();
         NativeModuleRegistryBuilder nativeRegistryBuilder = new NativeModuleRegistryBuilder(reactContext, false);
-        addNativeModules(reactContext,mModuleSpecList); //, nativeRegistryBuilder);
+        addNativeModules(reactContext, nativeRegistryBuilder);
 
         // load js modules
         JavaScriptModuleRegistry.Builder jsModulesBuilder = new JavaScriptModuleRegistry.Builder();
@@ -152,13 +151,11 @@ public class ReactContextBuilder {
         }
     }
 
-    private void addNativeModules(ReactApplicationContext reactContext,List<ModuleSpec> mModuleSpecList) { //, NativeModuleRegistry.Builder nativeRegistryBuilder) {
+    private void addNativeModules(ReactApplicationContext reactContext, NativeModuleRegistryBuilder nativeRegistryBuilder) {
         for (int i = 0; i < reactPackages.size(); i++) {
             ReactPackage reactPackage = reactPackages.get(i);
             for (NativeModule nativeModule : reactPackage.createNativeModules(reactContext)) {
-                //nativeRegistryBuilder.add(nativeModule);
-                ModuleSpec ms = new ModuleSpec(nativeModule.getClass(), new EagerModuleProvider(nativeModule));
-                mModuleSpecList.add(ms);
+                nativeRegistryBuilder.addNativeModule(nativeModule);
             }
         }
     }
